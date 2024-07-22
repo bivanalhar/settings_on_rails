@@ -14,7 +14,12 @@ module SettingsOnRails
       klass.class_eval do
         class_attribute Configuration::NAME_COLUMN, Configuration::DEFAULTS_COLUMN
 
-        serialize column, ActiveSupport::HashWithIndifferentAccess
+        if ActiveRecord.version > Gem::Version.new('7.1')
+          serialize column, type: ActiveSupport::HashWithIndifferentAccess, coder: YAML
+        else
+          serialize column, ActiveSupport::HashWithIndifferentAccess
+        end
+
         Configuration::init_defaults_column(self)
         Configuration::init_name_column(self, column)
       end
